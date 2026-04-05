@@ -1,0 +1,420 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&family=Fredoka+One&display=swap" rel="stylesheet"/>
+<style>
+  :root{--bg:#fef6e4;--accent:#f72585;--teal:#00b4d8;--purple:#7b2d8b;--dark:#1a1a2e;--text:#2d2d2d;--muted:#7a7a9a;}
+  *{box-sizing:border-box;margin:0;padding:0;}
+  body{font-family:'Nunito',sans-serif;background:var(--bg);background-image:radial-gradient(circle at 20% 20%,rgba(247,37,133,.07) 0%,transparent 50%),radial-gradient(circle at 80% 80%,rgba(0,180,216,.07) 0%,transparent 50%);min-height:100vh;color:var(--text);}
+
+  .header{background:linear-gradient(135deg,#f72585 0%,#7b2d8b 50%,#00b4d8 100%);padding:22px 24px 18px;text-align:center;position:relative;overflow:hidden;}
+  .header::before{content:'';position:absolute;inset:0;background:url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='%23ffffff' fill-opacity='0.05'%3E%3Ccircle cx='30' cy='30' r='10'/%3E%3C/g%3E%3C/svg%3E");pointer-events:none;}
+  .header h1{font-family:'Fredoka One',cursive;font-size:clamp(28px,5vw,52px);color:#fff;text-shadow:2px 3px 0 rgba(0,0,0,.15);letter-spacing:1px;}
+  .header p{color:rgba(255,255,255,.88);font-size:14px;margin-top:4px;font-weight:700;}
+
+  .question-strip{background:#fff;border-bottom:3px solid rgba(247,37,133,.12);padding:14px 20px;}
+  .question-strip-inner{max-width:1300px;margin:0 auto;display:flex;flex-wrap:wrap;gap:10px;justify-content:center;}
+  .q-pill{display:flex;align-items:center;gap:8px;background:linear-gradient(135deg,rgba(247,37,133,.08),rgba(123,45,139,.08));border:2px solid rgba(247,37,133,.18);border-radius:50px;padding:8px 18px;}
+  .q-num{background:var(--accent);color:#fff;font-family:'Fredoka One',cursive;font-size:13px;width:22px;height:22px;border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+  .q-text{font-size:13px;font-weight:800;color:var(--purple);}
+
+  .main{max-width:1300px;margin:0 auto;padding:20px 16px 60px;}
+
+  .post-box{background:#fff;border-radius:22px;padding:22px 22px 18px;box-shadow:0 4px 30px rgba(0,0,0,.1),0 0 0 2px rgba(247,37,133,.12);margin-bottom:28px;position:relative;overflow:hidden;}
+  .post-box::before{content:'';position:absolute;top:0;left:0;right:0;height:5px;background:linear-gradient(90deg,#f72585,#7b2d8b,#00b4d8);}
+  .post-box-label{font-family:'Fredoka One',cursive;font-size:17px;color:var(--purple);margin-bottom:10px;}
+
+  .write-area{width:100%;border:2.5px solid #ebebeb;border-radius:14px;padding:14px 16px;font-family:'Nunito',sans-serif;font-size:16px;font-weight:700;color:var(--dark);line-height:1.6;resize:none;outline:none;background:#fafafa;transition:border-color .2s,box-shadow .2s;min-height:90px;}
+  .write-area:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(247,37,133,.1);background:#fff;}
+  .write-area::placeholder{color:#c0c0d0;font-weight:600;}
+
+  /* IMAGE PICKER — tabs */
+  .picker-section{margin-top:14px;}
+  .picker-label{font-size:12px;font-weight:800;text-transform:uppercase;letter-spacing:.6px;color:var(--muted);margin-bottom:8px;}
+  .picker-tabs{display:flex;gap:8px;margin-bottom:12px;}
+  .ptab{padding:7px 18px;border-radius:50px;border:2px solid #e0e0e0;background:#fff;font-family:'Nunito',sans-serif;font-size:13px;font-weight:800;cursor:pointer;transition:all .18s;color:var(--muted);}
+  .ptab.active{background:var(--purple);border-color:var(--purple);color:#fff;}
+
+  /* GIF TAB */
+  .gif-search-row{display:flex;gap:8px;margin-bottom:10px;}
+  .gif-search-input{flex:1;border:2px solid #e0e0e0;border-radius:50px;padding:8px 16px;font-family:'Nunito',sans-serif;font-size:14px;font-weight:700;outline:none;color:var(--dark);background:#fafafa;transition:border-color .2s;}
+  .gif-search-input:focus{border-color:var(--teal);background:#fff;}
+  .gif-search-btn{background:var(--teal);color:#fff;border:none;border-radius:50px;padding:8px 18px;font-family:'Nunito',sans-serif;font-size:14px;font-weight:800;cursor:pointer;transition:all .2s;}
+  .gif-search-btn:hover{background:#0096b7;}
+  .gif-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(100px,1fr));gap:6px;max-height:200px;overflow-y:auto;border-radius:12px;}
+  .gif-grid::-webkit-scrollbar{width:4px;}
+  .gif-grid::-webkit-scrollbar-thumb{background:#e0e0e0;border-radius:4px;}
+  .gif-item{border-radius:10px;overflow:hidden;cursor:pointer;aspect-ratio:1;background:#f0f0f0;transition:transform .18s,box-shadow .18s;position:relative;}
+  .gif-item img{width:100%;height:100%;object-fit:cover;display:block;}
+  .gif-item:hover{transform:scale(1.06);box-shadow:0 4px 14px rgba(0,0,0,.15);}
+  .gif-item.selected{outline:3px solid var(--accent);box-shadow:0 0 0 4px rgba(247,37,133,.25);}
+  .gif-item.selected::after{content:'✓';position:absolute;top:4px;right:6px;background:var(--accent);color:#fff;font-size:12px;font-weight:900;border-radius:50%;width:20px;height:20px;display:flex;align-items:center;justify-content:center;}
+  .gif-msg{text-align:center;padding:20px;color:var(--muted);grid-column:1/-1;font-weight:700;font-size:13px;}
+  .powered{font-size:10px;color:#c0c0c0;font-weight:700;text-align:right;margin-top:4px;}
+
+  /* EMOJI TAB */
+  .emoji-search-input{width:100%;border:2px solid #e0e0e0;border-radius:50px;padding:8px 16px;font-family:'Nunito',sans-serif;font-size:14px;font-weight:700;outline:none;color:var(--dark);background:#fafafa;transition:border-color .2s;margin-bottom:10px;}
+  .emoji-search-input:focus{border-color:var(--teal);background:#fff;}
+  .emoji-cats{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:10px;}
+  .cat-btn{padding:5px 12px;border-radius:50px;border:2px solid #e0e0e0;background:#fff;font-size:12px;font-weight:800;cursor:pointer;transition:all .18s;color:var(--muted);white-space:nowrap;}
+  .cat-btn:hover{border-color:var(--purple);color:var(--purple);}
+  .cat-btn.active{background:var(--purple);border-color:var(--purple);color:#fff;}
+  .emoji-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(42px,1fr));gap:4px;max-height:180px;overflow-y:auto;padding:4px;border-radius:12px;background:#fafafa;border:2px solid #ebebeb;}
+  .emoji-grid::-webkit-scrollbar{width:4px;}
+  .emoji-grid::-webkit-scrollbar-thumb{background:#ddd;border-radius:4px;}
+  .e-btn{font-size:24px;width:42px;height:42px;display:flex;align-items:center;justify-content:center;border-radius:10px;cursor:pointer;border:2px solid transparent;transition:all .15s;background:transparent;user-select:none;}
+  .e-btn:hover{background:#fff;transform:scale(1.2);border-color:#e0e0e0;}
+  .e-btn.selected{background:#fff;border-color:var(--accent);box-shadow:0 0 0 3px rgba(247,37,133,.2);}
+
+  /* SELECTION PREVIEW */
+  .sel-preview{display:none;margin-top:10px;padding:10px 14px;background:#fafafa;border-radius:12px;border:2px solid rgba(247,37,133,.2);align-items:center;gap:12px;}
+  .sel-preview.visible{display:flex;}
+  .sel-thumb-gif{width:60px;height:60px;object-fit:cover;border-radius:8px;}
+  .sel-thumb-emoji{font-size:40px;line-height:1;}
+  .sel-text{font-size:13px;font-weight:700;color:var(--muted);}
+  .sel-text strong{color:var(--accent);}
+  .clear-btn{margin-left:auto;background:none;border:2px solid #e0e0e0;border-radius:50px;padding:4px 12px;font-family:'Nunito',sans-serif;font-size:12px;font-weight:800;cursor:pointer;color:var(--muted);transition:all .2s;}
+  .clear-btn:hover{border-color:var(--accent);color:var(--accent);}
+
+  .bottom-row{display:flex;align-items:center;justify-content:space-between;margin-top:14px;gap:10px;flex-wrap:wrap;}
+  .post-btn{background:linear-gradient(135deg,#f72585,#7b2d8b);color:#fff;border:none;border-radius:50px;padding:13px 36px;font-family:'Fredoka One',cursive;font-size:20px;cursor:pointer;letter-spacing:.5px;box-shadow:0 4px 16px rgba(247,37,133,.4);transition:all .2s;}
+  .post-btn:hover{transform:translateY(-2px);box-shadow:0 6px 22px rgba(247,37,133,.5);}
+  .post-btn:disabled{opacity:.5;cursor:not-allowed;transform:none;}
+  .hint{font-size:12px;color:var(--muted);font-weight:700;}
+  .error-msg{background:#fff0f0;border:2px solid #ffcccc;border-radius:10px;padding:8px 14px;font-size:13px;color:#c0392b;font-weight:700;margin-top:10px;}
+
+  /* WALL */
+  .wall-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:18px;flex-wrap:wrap;gap:10px;}
+  .wall-title{font-family:'Fredoka One',cursive;font-size:26px;color:var(--dark);}
+  .wall-count{background:var(--accent);color:#fff;border-radius:20px;padding:4px 14px;font-size:13px;font-weight:800;}
+  .refresh-btn{background:#fff;border:2px solid #e0e0e0;border-radius:20px;padding:6px 16px;font-family:'Nunito',sans-serif;font-size:13px;font-weight:700;cursor:pointer;color:var(--muted);transition:all .2s;}
+  .refresh-btn:hover{border-color:var(--teal);color:var(--teal);}
+
+  .cards-grid{columns:260px;column-gap:16px;}
+  .card{break-inside:avoid;border-radius:18px;padding:18px 16px 12px;margin-bottom:16px;box-shadow:0 4px 20px rgba(0,0,0,.08);position:relative;animation:cardIn .4s ease both;transition:transform .2s,box-shadow .2s;display:inline-block;width:100%;}
+  .card:hover{transform:translateY(-4px) rotate(.3deg);box-shadow:0 10px 28px rgba(0,0,0,.12);}
+  @keyframes cardIn{from{opacity:0;transform:translateY(18px) scale(.97)}to{opacity:1;transform:translateY(0) scale(1)}}
+  .card-pin{position:absolute;top:-11px;left:50%;transform:translateX(-50%);font-size:20px;filter:drop-shadow(0 2px 3px rgba(0,0,0,.18));}
+  .card-img{width:100%;border-radius:12px;display:block;margin-bottom:12px;max-height:180px;object-fit:cover;}
+  .card-emoji{font-size:64px;text-align:center;display:block;margin-bottom:12px;line-height:1;}
+  .card-text{font-size:15px;font-weight:700;color:var(--dark);line-height:1.55;}
+  .card-time{margin-top:8px;font-size:11px;color:rgba(0,0,0,.3);font-weight:800;text-transform:uppercase;letter-spacing:.5px;}
+
+  .reactions-bar{display:flex;flex-wrap:wrap;gap:5px;margin-top:10px;padding-top:10px;border-top:2px dashed rgba(0,0,0,.08);}
+  .reaction-btn{display:inline-flex;align-items:center;gap:4px;background:rgba(255,255,255,.65);border:2px solid rgba(0,0,0,.08);border-radius:50px;padding:4px 10px;font-size:14px;font-family:'Nunito',sans-serif;font-weight:800;cursor:pointer;transition:all .18s;color:var(--dark);user-select:none;}
+  .reaction-btn:hover{transform:scale(1.15) rotate(-3deg);background:rgba(255,255,255,.95);}
+  .reaction-btn.reacted{background:rgba(255,255,255,.95);border-color:var(--accent);box-shadow:0 0 0 2px rgba(247,37,133,.2);}
+  .reaction-count{font-size:12px;min-width:14px;}
+  @keyframes pop{0%{transform:scale(1)}40%{transform:scale(1.5) rotate(-8deg)}70%{transform:scale(.9) rotate(4deg)}100%{transform:scale(1.05)}}
+  .reaction-btn.popping{animation:pop .35s ease both;}
+  .burst{position:fixed;pointer-events:none;font-size:22px;z-index:9999;animation:burstUp .8s ease forwards;}
+  @keyframes burstUp{0%{opacity:1;transform:translateY(0) scale(1)}100%{opacity:0;transform:translateY(-70px) scale(1.6)}}
+
+  .empty-state{text-align:center;padding:60px 20px;color:var(--muted);}
+  .empty-state .big-emoji{font-size:60px;margin-bottom:14px;}
+  .empty-state h3{font-family:'Fredoka One',cursive;font-size:22px;color:var(--purple);margin-bottom:6px;}
+  .toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(80px);background:#1a1a2e;color:#fff;padding:11px 26px;border-radius:50px;font-weight:700;font-size:14px;box-shadow:0 8px 30px rgba(0,0,0,.25);transition:transform .4s cubic-bezier(.34,1.56,.64,1);z-index:999;white-space:nowrap;}
+  .toast.show{transform:translateX(-50%) translateY(0);}
+  .loading-state{text-align:center;padding:40px;font-weight:700;color:var(--muted);}
+</style>
+</head>
+<body>
+
+<div class="header">
+  <h1>👋 Who Are You?</h1>
+  <p>Introduce yourself to the class!</p>
+</div>
+
+<div class="question-strip">
+  <div class="question-strip-inner">
+    <div class="q-pill"><div class="q-num">1</div><div class="q-text">Your Name</div></div>
+    <div class="q-pill"><div class="q-num">2</div><div class="q-text">Where are you located?</div></div>
+    <div class="q-pill"><div class="q-num">3</div><div class="q-text">What is your major?</div></div>
+    <div class="q-pill"><div class="q-num">4</div><div class="q-text">What is your superpower?</div></div>
+  </div>
+</div>
+
+<div class="main">
+  <div class="post-box">
+    <div class="post-box-label">✏️ Answer all 4 questions below!</div>
+    <textarea class="write-area" id="f-text" placeholder="e.g. I'm Mari, from Fort Lauderdale FL. My major is Business Law and my superpower is I never miss a deadline!" maxlength="280"></textarea>
+
+    <div class="picker-section">
+      <div class="picker-label">🖼️ Pick a GIF or Emoji that represents you!</div>
+      <div class="picker-tabs">
+        <button class="ptab active" id="tab-gif-btn" onclick="switchTab('gif')">🎞️ GIF</button>
+        <button class="ptab" id="tab-emoji-btn" onclick="switchTab('emoji')">😀 Emoji</button>
+      </div>
+
+      <!-- GIF PANEL -->
+      <div id="panel-gif">
+        <div class="gif-search-row">
+          <input class="gif-search-input" id="gif-query" type="text" placeholder="Search: Florida, strong, excited, NYC..." maxlength="60" onkeydown="if(event.key==='Enter')searchGifs()"/>
+          <button class="gif-search-btn" onclick="searchGifs()">Search</button>
+        </div>
+        <div class="gif-grid" id="gif-grid">
+          <div class="gif-msg">🔍 Search for a GIF above!</div>
+        </div>
+        <div class="powered">GIFs powered by Tenor</div>
+      </div>
+
+      <!-- EMOJI PANEL -->
+      <div id="panel-emoji" style="display:none">
+        <input class="emoji-search-input" id="emoji-search" type="text" placeholder="Search: sun, book, heart, strong..." oninput="filterEmojis(this.value)"/>
+        <div class="emoji-cats" id="emoji-cats"></div>
+        <div class="emoji-grid" id="emoji-grid"></div>
+      </div>
+
+      <!-- SHARED SELECTION PREVIEW -->
+      <div class="sel-preview" id="sel-preview">
+        <div id="sel-thumb"></div>
+        <div class="sel-text">✅ <strong>Selected!</strong> Ready to post.</div>
+        <button class="clear-btn" onclick="clearSelection()">✕ Remove</button>
+      </div>
+    </div>
+
+    <div id="post-error" class="error-msg" style="display:none"></div>
+    <div class="bottom-row">
+      <div class="hint">🌐 Everyone in the class will see your post</div>
+      <button class="post-btn" id="post-btn" onclick="submitPost()">📌 Post it!</button>
+    </div>
+  </div>
+
+  <div class="wall-header">
+    <div class="wall-title">🏫 Who Are You? — The Wall</div>
+    <div style="display:flex;align-items:center;gap:10px">
+      <span class="wall-count" id="post-count">0 posts</span>
+      <button class="refresh-btn" onclick="loadPosts()">🔄 Refresh</button>
+    </div>
+  </div>
+  <div id="wall-loading" class="loading-state">Loading the wall... 🎓</div>
+  <div id="cards-grid" class="cards-grid" style="display:none"></div>
+  <div id="empty-state" class="empty-state" style="display:none">
+    <div class="big-emoji">🎉</div>
+    <h3>Be the first to post!</h3>
+    <p>Answer the 4 questions and pick a GIF or emoji.</p>
+  </div>
+</div>
+<div class="toast" id="toast"></div>
+
+<script>
+// ── STORAGE ───────────────────────────────────────────────────────
+const mem = {};
+let useShared = false;
+(async()=>{
+  try{ if(window.storage){ const r=await window.storage.set('_ping','1',true); useShared=!!r; } }catch(e){}
+})();
+
+async function sSet(k,v){ if(useShared){try{return await window.storage.set(k,v,true);}catch(e){}} mem[k]=v; return true; }
+async function sGet(k){ if(useShared){try{const r=await window.storage.get(k,true);return r?.value??null;}catch(e){}} return mem[k]??null; }
+async function sList(p){ if(useShared){try{return(await window.storage.list(p,true))?.keys??[];}catch(e){}} return Object.keys(mem).filter(k=>k.startsWith(p)); }
+
+// ── STATE ─────────────────────────────────────────────────────────
+const TENOR = 'LIVDSRZULELA';
+let activeTab = 'gif';
+let selection = null; // { type:'gif'|'emoji', gifUrl:'', gifTiny:'', emoji:'' }
+let activeEmojiCat = 'ALL';
+
+const CATEGORIES = {
+  '😀 Faces':  ['😀','😂','😍','🤩','😎','🥳','😴','🤔','😤','🥹','😅','🤗','😇','🤓','😏','🤯','😆','🤪','😜','🫡'],
+  '💪 Vibes':  ['💪','🔥','⚡','✨','🌟','💫','🎯','🏆','👑','💡','🚀','🎉','💥','🌈','❤️','💜','🖤','💚','🧡','🫶'],
+  '🌎 Places': ['🌎','🌴','🏖️','🏙️','🌆','🏡','🏔️','🌊','🌅','🗽','🗼','🏰','🌵','🏝️','🌋','🌁','🏕️','🌇','🌃','🌉'],
+  '🎓 School': ['🎓','📚','📖','✏️','💻','🖥️','📝','🔬','⚖️','💼','📊','🩺','🏗️','🎨','🎭','🎤','🧮','📐','🔭','🧪'],
+  '🐾 Animals':['🐶','🐱','🦁','🐯','🦊','🐺','🐻','🦅','🦋','🐬','🐉','🦄','🐝','🦚','🦜','🐙','🦈','🐘','🦒','🦓'],
+  '🍕 Food':   ['🍕','☕','🍜','🌮','🍣','🍩','🍦','🎂','🍓','🥑','🍔','🌯','🥗','🍱','🧋','🍷','🥤','🍪','🫐','🍉'],
+  '⚽ Sports': ['⚽','🏀','🏈','⚾','🎾','🏊','🏋️','🧘','🚴','🏄','🥊','🎯','🎮','🎲','♟️','🥇','🎳','🤸','🏇','🛹'],
+  '🎵 Arts':   ['🎵','🎸','🎹','🎨','🖼️','📸','🎬','🎭','🎤','🎧','📻','🎺','🥁','🪗','🎻','📺','✍️','🖌️','📷','🎪'],
+};
+const ALL_EMOJI = Object.entries(CATEGORIES).flatMap(([cat,es])=>es.map(e=>({e,cat})));
+const REACTIONS = ['❤️','🔥','👏','😄','🌟','🤩'];
+const COLORS=['#fff1c1','#d4f1f4','#ffd6e0','#d5f5e3','#e8daff','#ffe5cc','#c8f7fe','#fce4ec','#f3e5f5','#e8f5e9'];
+const PINS=['📌','📍','🔖','⭐','✨','💫','🎯','❤️','🌟','💥'];
+const myReactions={};
+
+// ── TABS ──────────────────────────────────────────────────────────
+function switchTab(tab){
+  activeTab=tab;
+  document.getElementById('tab-gif-btn').classList.toggle('active',tab==='gif');
+  document.getElementById('tab-emoji-btn').classList.toggle('active',tab==='emoji');
+  document.getElementById('panel-gif').style.display=tab==='gif'?'':'none';
+  document.getElementById('panel-emoji').style.display=tab==='emoji'?'':'none';
+}
+
+// ── GIF ───────────────────────────────────────────────────────────
+async function searchGifs(){
+  const q=document.getElementById('gif-query').value.trim(); if(!q)return;
+  const grid=document.getElementById('gif-grid');
+  grid.innerHTML='<div class="gif-msg">Searching... 🔍</div>';
+  try{
+    const res=await fetch(`https://api.tenor.com/v1/search?q=${encodeURIComponent(q)}&key=${TENOR}&limit=18&contentfilter=high&media_filter=minimal`);
+    if(!res.ok)throw new Error('HTTP '+res.status);
+    const data=await res.json();
+    if(!data.results?.length){grid.innerHTML='<div class="gif-msg">😕 No GIFs found — try another word!</div>';return;}
+    grid.innerHTML=data.results.map(g=>{
+      const m=g.media[0];
+      const full=m.gif?.url||''; const tiny=m.tinygif?.url||m.nanogif?.url||full;
+      return `<div class="gif-item" data-full="${esc(full)}" data-tiny="${esc(tiny)}" onclick="pickGif(this)"><img src="${esc(tiny)}" loading="lazy"/></div>`;
+    }).join('');
+  }catch(e){
+    grid.innerHTML='<div class="gif-msg">⚠️ GIFs unavailable in preview — switch to Emoji tab or try when shared!</div>';
+  }
+}
+function pickGif(el){
+  document.querySelectorAll('.gif-item').forEach(i=>i.classList.remove('selected'));
+  el.classList.add('selected');
+  selection={type:'gif',gifUrl:el.dataset.full,gifTiny:el.dataset.tiny,emoji:''};
+  showSelPreview();
+}
+
+// ── EMOJI ─────────────────────────────────────────────────────────
+function buildCats(){
+  const wrap=document.getElementById('emoji-cats');
+  const mk=(label,cat)=>{const b=document.createElement('button');b.className='cat-btn'+(cat==='ALL'?' active':'');b.textContent=label;b.onclick=()=>setEmojiCat(cat,b);wrap.appendChild(b);};
+  mk('🌀 All','ALL');
+  Object.keys(CATEGORIES).forEach(c=>mk(c,c));
+}
+function setEmojiCat(cat,btn){
+  activeEmojiCat=cat;
+  document.querySelectorAll('.cat-btn').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  document.getElementById('emoji-search').value='';
+  renderEmojiGrid();
+}
+function filterEmojis(q){
+  activeEmojiCat='ALL';
+  document.querySelectorAll('.cat-btn').forEach((b,i)=>b.classList.toggle('active',i===0));
+  renderEmojiGrid(q.trim().toLowerCase());
+}
+function renderEmojiGrid(search=''){
+  let list=activeEmojiCat==='ALL'?ALL_EMOJI:ALL_EMOJI.filter(x=>x.cat===activeEmojiCat);
+  if(search)list=ALL_EMOJI.filter(x=>x.cat.toLowerCase().includes(search));
+  const sel=selection?.type==='emoji'?selection.emoji:'';
+  document.getElementById('emoji-grid').innerHTML=list.map(({e})=>
+    `<button class="e-btn${e===sel?' selected':''}" onclick="pickEmoji('${e}')">${e}</button>`
+  ).join('');
+}
+function pickEmoji(e){
+  selection={type:'emoji',gifUrl:'',gifTiny:'',emoji:e};
+  renderEmojiGrid(document.getElementById('emoji-search').value.trim().toLowerCase());
+  showSelPreview();
+}
+
+// ── SELECTION PREVIEW ─────────────────────────────────────────────
+function showSelPreview(){
+  const prev=document.getElementById('sel-preview');
+  const thumb=document.getElementById('sel-thumb');
+  if(!selection){prev.classList.remove('visible');return;}
+  if(selection.type==='gif'){
+    thumb.innerHTML=`<img class="sel-thumb-gif" src="${esc(selection.gifTiny)}" alt=""/>`;
+  } else {
+    thumb.innerHTML=`<div class="sel-thumb-emoji">${selection.emoji}</div>`;
+  }
+  prev.classList.add('visible');
+}
+function clearSelection(){
+  selection=null;
+  document.querySelectorAll('.gif-item').forEach(i=>i.classList.remove('selected'));
+  renderEmojiGrid();
+  document.getElementById('sel-preview').classList.remove('visible');
+}
+
+// ── POST ──────────────────────────────────────────────────────────
+function showToast(msg){const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),3000);}
+function showError(msg){const el=document.getElementById('post-error');el.textContent=msg;el.style.display=msg?'':'none';}
+
+async function submitPost(){
+  const text=document.getElementById('f-text').value.trim();
+  if(!text){showError('Write something first! 😊');return;}
+  showError('');
+  const post={
+    id:Date.now().toString(36)+Math.random().toString(36).slice(2,6),
+    text,
+    gifTiny: selection?.type==='gif' ? selection.gifTiny : '',
+    emoji:   selection?.type==='emoji' ? selection.emoji : (selection?'':'🌟'),
+    ts:Date.now()
+  };
+  const btn=document.getElementById('post-btn');
+  btn.disabled=true;btn.textContent='Posting... 🚀';
+  try{
+    await sSet('way:'+post.id, JSON.stringify(post));
+    const initRxn={};REACTIONS.forEach(e=>initRxn[e]=0);
+    await sSet('rxn:'+post.id, JSON.stringify(initRxn));
+    document.getElementById('f-text').value='';
+    clearSelection();
+    document.getElementById('gif-grid').innerHTML='<div class="gif-msg">🔍 Search for a GIF above!</div>';
+    document.getElementById('gif-query').value='';
+    showToast('🎉 You\'re on the wall!');
+    await loadPosts();
+  }catch(e){console.error(e);showError('Could not save — please try again!');}
+  btn.disabled=false;btn.textContent='📌 Post it!';
+}
+
+// ── REACTIONS ─────────────────────────────────────────────────────
+async function react(postId,emoji,btn){
+  if(!myReactions[postId])myReactions[postId]=new Set();
+  const already=myReactions[postId].has(emoji);
+  const countEl=btn.querySelector('.reaction-count');
+  const cur=parseInt(countEl.textContent)||0;
+  if(already){myReactions[postId].delete(emoji);countEl.textContent=Math.max(0,cur-1);btn.classList.remove('reacted');}
+  else{myReactions[postId].add(emoji);countEl.textContent=cur+1;btn.classList.add('reacted');btn.classList.remove('popping');void btn.offsetWidth;btn.classList.add('popping');spawnBurst(emoji,btn);}
+  try{
+    let rxns={}; const raw=await sGet('rxn:'+postId); if(raw)rxns=JSON.parse(raw);
+    REACTIONS.forEach(e=>{if(!rxns[e])rxns[e]=0;});
+    rxns[emoji]=Math.max(0,(rxns[emoji]||0)+(already?-1:1));
+    await sSet('rxn:'+postId,JSON.stringify(rxns));
+    countEl.textContent=rxns[emoji];
+  }catch(e){}
+}
+function spawnBurst(emoji,btn){const rect=btn.getBoundingClientRect(),el=document.createElement('div');el.className='burst';el.textContent=emoji;el.style.left=(rect.left+rect.width/2-11)+'px';el.style.top=(rect.top-10)+'px';document.body.appendChild(el);setTimeout(()=>el.remove(),900);}
+
+// ── WALL ──────────────────────────────────────────────────────────
+async function loadPosts(){
+  document.getElementById('wall-loading').style.display='';
+  document.getElementById('cards-grid').style.display='none';
+  document.getElementById('empty-state').style.display='none';
+  try{
+    const keys=await sList('way:');
+    const posts=[];
+    for(const k of keys){try{const r=await sGet(k);if(r)posts.push(JSON.parse(r));}catch(e){}}
+    posts.sort((a,b)=>b.ts-a.ts);
+    const rxnMap={};
+    await Promise.all(posts.map(async p=>{try{const r=await sGet('rxn:'+p.id);rxnMap[p.id]=r?JSON.parse(r):{};}catch(e){rxnMap[p.id]={}; }}));
+    renderPosts(posts,rxnMap);
+  }catch(e){console.error(e);document.getElementById('wall-loading').style.display='none';document.getElementById('empty-state').style.display='';}
+}
+function esc(s){return(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');}
+function timeAgo(ts){const m=Math.floor((Date.now()-ts)/60000);if(m<1)return'Just now';if(m<60)return m+'m ago';const h=Math.floor(m/60);if(h<24)return h+'h ago';return Math.floor(h/24)+'d ago';}
+
+function renderPosts(posts,rxnMap){
+  document.getElementById('wall-loading').style.display='none';
+  const grid=document.getElementById('cards-grid');
+  document.getElementById('post-count').textContent=posts.length+(posts.length===1?' post':' posts');
+  if(!posts.length){grid.style.display='none';document.getElementById('empty-state').style.display='';return;}
+  grid.style.display='';document.getElementById('empty-state').style.display='none';
+  grid.innerHTML=posts.map((p,i)=>{
+    const color=COLORS[i%COLORS.length],pin=PINS[i%PINS.length],rxns=rxnMap[p.id]||{};
+    const mediaHtml = p.gifTiny
+      ? `<img class="card-img" src="${esc(p.gifTiny)}" loading="lazy" alt=""/>`
+      : `<div class="card-emoji">${p.emoji||'🌟'}</div>`;
+    const rxnBtns=REACTIONS.map(e=>{
+      const count=rxns[e]||0,reacted=myReactions[p.id]?.has(e)?'reacted':'';
+      return `<button class="reaction-btn ${reacted}" onclick="react('${esc(p.id)}','${e}',this)">${e}<span class="reaction-count">${count}</span></button>`;
+    }).join('');
+    return `<div class="card" style="background:${color};animation-delay:${Math.min(i*.05,.5)}s">
+      <div class="card-pin">${pin}</div>
+      ${mediaHtml}
+      <div class="card-text">${esc(p.text)}</div>
+      <div class="card-time">${timeAgo(p.ts)}</div>
+      <div class="reactions-bar">${rxnBtns}</div>
+    </div>`;
+  }).join('');
+}
+
+buildCats(); renderEmojiGrid(); loadPosts();
+setInterval(loadPosts,20000);
+</script>
+</body>
+</html>
